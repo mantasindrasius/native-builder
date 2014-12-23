@@ -1,17 +1,17 @@
-package lt.indrasius.nbuilder
+package lt.indrasius.nbuilder.it
 
 import java.io.File
 import java.nio.file.attribute.PosixFilePermission
-import java.nio.file.{Paths, Files}
+import java.nio.file.{Files, Paths}
 
 import com.twitter.io.TempDirectory
 import lt.indrasius.nbuilder.http.HttpClient
-import lt.indrasius.nbuilder.it.{E2E, ConfigureMakeProject, ArtifactStorage}
+import lt.indrasius.nbuilder.{ConfigureMakeBuilder, ProcessFactory}
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.MustMatchers
 
+import scala.collection.convert.wrapAsJava.{seqAsJavaList, setAsJavaSet}
 import scala.sys.process.Process
-import collection.convert.wrapAsJava.{setAsJavaSet, seqAsJavaList}
 
 /**
  * Created by mantas on 14.12.22.

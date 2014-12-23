@@ -1,7 +1,6 @@
-package lt.indrasius.nbuilder
+package lt.indrasius.nbuilder.it
 
 import lt.indrasius.nbuilder.http.HttpClient
-import lt.indrasius.nbuilder.it.{EmbeddedConfig, EmbeddedResourceServer}
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.MustMatchers
 import spray.http.{HttpEntity, StatusCodes}

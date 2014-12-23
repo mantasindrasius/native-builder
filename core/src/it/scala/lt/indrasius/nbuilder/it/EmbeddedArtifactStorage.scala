@@ -21,18 +21,6 @@ object EmbeddedArtifactStorageServer extends EmbeddedServer(EmbeddedConfig.STORA
   val BASE_URL = s"http://localhost:${EmbeddedConfig.STORAGE_PORT}/libs/"
   val basePath = Uri(BASE_URL).path
 
-  private val permissions = Map(
-    PosixFilePermission.OWNER_READ -> 0400,
-    PosixFilePermission.OWNER_WRITE -> 0200,
-    PosixFilePermission.OWNER_EXECUTE -> 0100,
-    PosixFilePermission.GROUP_READ -> 040,
-    PosixFilePermission.GROUP_WRITE -> 020,
-    PosixFilePermission.GROUP_EXECUTE -> 010,
-    PosixFilePermission.OTHERS_READ -> 04,
-    PosixFilePermission.OTHERS_WRITE -> 02,
-    PosixFilePermission.OTHERS_EXECUTE -> 01
-  )
-
   def receive = {
     case req: HttpRequest =>
       val name = basePath.relativize(req.uri.path).toString()
@@ -50,42 +38,15 @@ object EmbeddedArtifactStorageServer extends EmbeddedServer(EmbeddedConfig.STORA
   def artifactUrl(name: String): String = BASE_URL + name + ".tar.gz"
 
   def produceArchive(project: ConfigureMakeProject): HttpEntity = {
-    val bOut = new ByteArrayOutputStream()
-    val gzipOut = new GZIPOutputStream(bOut)
-    val tarOut = new TarOutputStream(gzipOut)
+    val b = TarGzArchiveBuilder()
 
-    //val f = new File("/media/DevZone/Dev/bison-2.7/configure")
-    //val fs = new FileInputStream(f)
+    b.addEntry("configure", makeConfigureBody(project))
 
-    def writeEntry(name: String, content: String): Try[Unit] = Try {
-      //val entry = new TarEntry(f, "configure")
-      val contentBytes = content.getBytes("UTF-8")
-      val header = TarHeader.createHeader(name, contentBytes.size, 1, false)
-      val perms = Set(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_EXECUTE) //Files.getPosixFilePermissions(Paths.get(f.getAbsolutePath))
+    val bytes = b.build
 
-      header.mode = permsToInt(perms)
+    println(s"Respond with ${bytes.size} bytes")
 
-      val entry = new TarEntry(header)
-
-      tarOut.putNextEntry(entry)
-      tarOut.write(contentBytes)
-    }
-
-    writeEntry("configure", makeConfigureBody(project))
-
-    //tarOut.putNextEntry(new TarEntry(TarHeader.createHeader("configure",)))
-
-    //tarOut.write('O')
-    //tarOut.write('K')
-
-    tarOut.close()
-    gzipOut.close()
-
-    val outBytes = bOut.toByteArray
-
-    println(s"Respond with ${outBytes.size} bytes")
-
-    HttpEntity(outBytes)
+    HttpEntity(bytes)
   }
 
   def makeConfigureBody(project: ConfigureMakeProject): String = {
@@ -137,15 +98,6 @@ object EmbeddedArtifactStorageServer extends EmbeddedServer(EmbeddedConfig.STORA
 
     sb.toString()
   }
-
-  def permsToInt(perms: Set[PosixFilePermission]): Int = {
-    val result = perms map { permissions.get(_) } collect {
-      case Some(v) => v
-    }
-
-    result.foldLeft(0) { (a: Int, b: Int) => a | b }
-  }
-
 
   implicit class RichInputStream(in: InputStream) {
     def toBytes = Stream.continually(in.read()).takeWhile(_ != -1).map(_.toByte).toArray
