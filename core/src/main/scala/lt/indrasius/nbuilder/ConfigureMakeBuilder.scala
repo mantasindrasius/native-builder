@@ -1,6 +1,6 @@
 package lt.indrasius.nbuilder
 
-import java.io.{ByteArrayInputStream, EOFException, File, FileOutputStream}
+import java.io._
 import java.nio.file.attribute.PosixFilePermission
 import java.nio.file.{Files, Paths}
 import java.util.zip.GZIPInputStream
@@ -17,7 +17,7 @@ import scala.util.{Failure, Success, Try}
 /**
  * Created by mantas on 14.12.22.
  */
-class ConfigureMakeBuilder(url: String, installDir: String, processFactory: ProcessFactory, makeCommandPath: String) {
+class ConfigureMakeBuilder(httpClient: HttpClient, url: String, installDir: String, processFactory: ProcessFactory, makeCommandPath: String) {
 
   private val permissions = Map(
     0400 -> PosixFilePermission.OWNER_READ,
@@ -31,20 +31,21 @@ class ConfigureMakeBuilder(url: String, installDir: String, processFactory: Proc
     01 -> PosixFilePermission.OTHERS_EXECUTE
   )
 
-  def build: Try[Unit] =
-    HttpClient.get(url) match {
-      case HttpResponse(StatusCodes.OK, entity, _, _) =>
-        buildWith(entity.data.toByteArray)
-    }
+  val downloader = new ResourceDownloader(httpClient, new FileResourceHandler)
+  //val downloadHandler = SavingToTempStreamHandler(httpClient)
 
-  private def buildWith(bytes: Array[Byte]): Try[Unit] =
-    for { dir <- unpack(bytes)
-          _ <- run(dir) }
+  def build: Try[Unit] =
+    for { projectDir <- Try { TempDirectory.create(true) } map { _.getAbsolutePath }
+          context <- downloader.download(url, projectDir)
+          in <- context.openRead
+          dir <- unpack(in)
+          _ <- configure(dir)
+          _ <- make(dir)
+          _ <- install(dir) }
       yield ()
 
-  private def unpack(bytes: Array[Byte]): Try[String] = {
-    val inp = new ByteArrayInputStream(bytes)
-    val gzipIn = new GZIPInputStream(inp)
+  private def unpack(in: InputStream): Try[String] = {
+    val gzipIn = new GZIPInputStream(in)
     val tarIn = new TarInputStream(gzipIn)
 
     val projectDir = TempDirectory.create(true)

@@ -17,32 +17,36 @@ package object http {
   private val pipeline: HttpRequest => Future[HttpResponse] = sendReceive
   //private val waitFor = Duration(2, TimeUnit.SECONDS)
 
-  class RelativeRequest(baseUrl: String, b: RequestBuilder) {
+  /*class RelativeRequest(baseUrl: String, b: RequestBuilder) {
     val req = new Request(b)
 
     def apply(path: String) = req(Uri(baseUrl) / path)
     def apply(path: String, withAspects: RequestTransformer) = req(Uri(baseUrl) / path, withAspects)
-  }
+  }*/
 
-  class Request(b: RequestBuilder) {
-    def apply(url: Uri): HttpResponse =
-      pipeline(b(url))
+  class Request private[http] (b: RequestBuilder, baseUri: Option[Uri] = None) {
+    def apply(url: String): HttpResponse =
+      pipeline(b(resolve(url)))
 
-    def apply(url: Uri, withAspects: RequestTransformer): HttpResponse =
-      pipeline(b(url) ~> withAspects)
+    def apply(url: String, withAspects: RequestTransformer): HttpResponse =
+      pipeline(b(resolve(url)) ~> withAspects)
+
+    private def resolve(url: String): Uri =
+      baseUri map { Uri(url).resolvedAgainst(_) } getOrElse(Uri(url))
 
     implicit private def await(f: => Future[HttpResponse]): HttpResponse =
       Await.result(f, Duration.Inf)
   }
 
-  case class HttpClient(baseUrl: String) {
-    private val url = Uri(baseUrl)
+  class HttpClient private(baseUrl: Option[String] = None) {
+    def get = request(Get)
 
-    def get = new RelativeRequest(baseUrl, Get)
+    def request(b: RequestBuilder): Request = new Request(b, baseUrl map { Uri(_) })
   }
 
-  case object HttpClient {
-    def get = new Request(Get)
+  object HttpClient {
+    def apply() = new HttpClient()
+    def apply(baseUrl: String) = new HttpClient(Some(baseUrl))
   }
 
   implicit def stringToUri(src: String): Uri =
@@ -54,6 +58,12 @@ package object http {
         uri.withPath(uri.path + path)
       else
         uri.withPath(uri.path / path)
+
+    /*def resolve(givenUrl: String): Uri =
+      Uri(givenUrl) match {
+        case givenUri if uri.isAbsolute => givenUri.resolvedAgainst(uri)
+        case givenUri => givenUri.resolvedAgainst(uri)
+      }*/
   }
 
   implicit class RequestComposition(source: RequestTransformer) {

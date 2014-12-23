@@ -5,6 +5,7 @@ import java.nio.file.attribute.PosixFilePermission
 import java.nio.file.{Paths, Files}
 
 import com.twitter.io.TempDirectory
+import lt.indrasius.nbuilder.http.HttpClient
 import lt.indrasius.nbuilder.it.{E2E, ConfigureMakeProject, ArtifactStorage}
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.MustMatchers
@@ -60,8 +61,9 @@ class ConfigureMakeBuilderIT extends FlatSpec with MustMatchers with E2E {
     val artifactUrl = ArtifactStorage.addArtifactFromProject("cool-project", project)
     val installDir = TempDirectory.create(true)
     val artifactPath = new File(installDir, "helloworld").getAbsolutePath
+    val httpClient = HttpClient()
 
-    testCode(new ConfigureMakeBuilder(artifactUrl, installDir.getAbsolutePath, SandboxProcessFactory, SandboxProcessFactory.makePath), artifactPath) // "loan" the fixture to the test
+    testCode(new ConfigureMakeBuilder(httpClient, artifactUrl, installDir.getAbsolutePath, SandboxProcessFactory, SandboxProcessFactory.makePath), artifactPath) // "loan" the fixture to the test
   }
 
   "ConfigureMakeBuilder" should "build a simple project successfully" in withSuccessProject { (builder, artifactPath) =>

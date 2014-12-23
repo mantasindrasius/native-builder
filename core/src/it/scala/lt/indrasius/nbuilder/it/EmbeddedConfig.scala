@@ -7,5 +7,6 @@ import akka.actor.ActorSystem
  */
 object EmbeddedConfig {
   val STORAGE_PORT = 9902
+  val RESOURCE_PORT = 9903
   val actorSystem = ActorSystem()
 }

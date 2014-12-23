@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import akka.actor._
 import akka.io.IO
 import spray.can.Http
-import spray.http.{Uri, HttpResponse, HttpRequest}
+import spray.http._
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, promise}
 
@@ -57,7 +57,16 @@ abstract class EmbeddedServer(port: Int) { server =>
   private class ConnectionHandler(id: Int, ev: Http.Connected) extends Actor with ActorLogging {
     def receive: Receive = {
       case r: HttpRequest =>
-        sender ! server.receive.apply(r)
+        Try { server.receive.apply(r) } recover {
+          case e: MatchError =>
+            HttpResponse(StatusCodes.NotFound, HttpEntity("Not found"))
+          case e: Throwable =>
+            log.error(e, "Internal server error")
+
+            HttpResponse(StatusCodes.InternalServerError, HttpEntity("Internal server error"))
+        } map {
+          sender ! _
+        }
     }
   }
 
