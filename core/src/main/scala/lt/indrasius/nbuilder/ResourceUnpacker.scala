@@ -1,16 +1,15 @@
 package lt.indrasius.nbuilder
 
-import java.io.{FileOutputStream, File, EOFException, InputStream}
+import java.io.{EOFException, File, FileOutputStream, InputStream}
 import java.nio.file.attribute.PosixFilePermission
-import java.nio.file.{Paths, Files}
+import java.nio.file.{Files, Paths}
 import java.util.zip.GZIPInputStream
 
-import com.twitter.io.TempDirectory
 import org.kamranzafar.jtar.{TarEntry, TarInputStream}
 
 import scala.annotation.tailrec
+import scala.collection.convert.wrapAsJava.setAsJavaSet
 import scala.util.{Failure, Success, Try}
-import collection.convert.wrapAsJava.setAsJavaSet
 
 /**
  * Created by mantas on 14.12.23.

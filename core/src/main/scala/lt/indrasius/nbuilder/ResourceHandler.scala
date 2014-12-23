@@ -19,8 +19,6 @@ case class FileResourceContext(file: File) extends ResourceContext {
   def openRead: Try[InputStream] = Try { new FileInputStream(file) }
 }
 
-case class Chunk(bytes: Array[Byte])
-
 class FileResourceHandler extends ResourceHandler {
   def save(filename: String, bytes: Array[Byte]) =
     Try { new FileOutputStream(filename) } map { fs =>

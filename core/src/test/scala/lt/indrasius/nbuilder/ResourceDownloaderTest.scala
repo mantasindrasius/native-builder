@@ -37,7 +37,7 @@ class ResourceDownloaderTest extends FlatSpec with MustMatchers with MockitoSuga
     when(request.apply(givenUri)).thenReturn(givenResponse)
     when(resourceHandler.save(targetFile, givenBytes)).thenReturn(Success(resourceContext))
 
-    downloader.download(givenUri, givenTargetDir) must be a 'success
+    downloader.download(givenUri, givenTargetDir) must be 'success
 
     verify(request).apply(givenUri)
     verify(resourceHandler).save(targetFile, givenBytes)

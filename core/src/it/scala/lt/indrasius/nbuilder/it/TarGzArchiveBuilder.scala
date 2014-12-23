@@ -6,8 +6,6 @@ import java.util.zip.GZIPOutputStream
 
 import org.kamranzafar.jtar.{TarEntry, TarHeader, TarOutputStream}
 
-import scala.util.Try
-
 /**
  * Created by mantas on 14.12.23.
  */
