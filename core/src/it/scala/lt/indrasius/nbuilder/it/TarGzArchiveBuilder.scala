@@ -26,17 +26,19 @@ class TarGzArchiveBuilder {
   val gzipOut = new GZIPOutputStream(bOut)
   val tarOut = new TarOutputStream(gzipOut)
 
-  def addEntry(name: String, content: String): TarGzArchiveBuilder = {
+  def addDir(name: String): TarGzArchiveBuilder = {
+    addEntry(TarHeader.createHeader(name, 0, 1, true))
+
+    this
+  }
+
+  def addFile(name: String, content: String): TarGzArchiveBuilder = {
     //val entry = new TarEntry(f, "configure")
     val contentBytes = content.getBytes("UTF-8")
     val header = TarHeader.createHeader(name, contentBytes.size, 1, false)
-    val perms = Set(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_EXECUTE) //Files.getPosixFilePermissions(Paths.get(f.getAbsolutePath))
 
-    header.mode = permsToInt(perms)
+    addEntry(header)
 
-    val entry = new TarEntry(header)
-
-    tarOut.putNextEntry(entry)
     tarOut.write(contentBytes)
 
     this
@@ -47,6 +49,16 @@ class TarGzArchiveBuilder {
     gzipOut.close()
 
     bOut.toByteArray
+  }
+
+  private def addEntry(header: TarHeader) = {
+    val perms = Set(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE,
+      PosixFilePermission.OWNER_EXECUTE)
+    header.mode = permsToInt(perms)
+
+    val entry = new TarEntry(header)
+
+    tarOut.putNextEntry(entry)
   }
 
   private def permsToInt(perms: Set[PosixFilePermission]): Int = {

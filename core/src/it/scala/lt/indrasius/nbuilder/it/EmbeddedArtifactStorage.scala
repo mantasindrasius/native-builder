@@ -29,7 +29,7 @@ object EmbeddedArtifactStorageServer extends EmbeddedServer(EmbeddedConfig.STORA
 
       ArtifactStorage.getProject(basename) match {
         case Some(project) =>
-          HttpResponse(StatusCodes.OK, produceArchive(project))
+          HttpResponse(StatusCodes.OK, produceArchive(basename, project))
         case None =>
           HttpResponse(StatusCodes.NotFound, HttpEntity("Not Found"))
       }
@@ -37,12 +37,11 @@ object EmbeddedArtifactStorageServer extends EmbeddedServer(EmbeddedConfig.STORA
 
   def artifactUrl(name: String): String = BASE_URL + name + ".tar.gz"
 
-  def produceArchive(project: ConfigureMakeProject): HttpEntity = {
-    val b = TarGzArchiveBuilder()
-
-    b.addEntry("configure", makeConfigureBody(project))
-
-    val bytes = b.build
+  def produceArchive(name: String, project: ConfigureMakeProject): HttpEntity = {
+    val bytes = TarGzArchiveBuilder()
+      .addDir(name)
+      .addFile(name + "/configure", makeConfigureBody(project))
+      .build
 
     println(s"Respond with ${bytes.size} bytes")
 

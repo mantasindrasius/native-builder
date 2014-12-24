@@ -44,6 +44,14 @@ class TarGzResourceUnpacker extends ResourceUnpacker {
           println("eof")
 
           Success()
+        case Success(entry) if entry.isDirectory =>
+          val file = new File(targetDir, entry.getName)
+          file.mkdirs()
+
+          Files.setPosixFilePermissions(Paths.get(file.getAbsolutePath),
+            convertToPermissionsSet(entry.getHeader.mode))
+
+          readEntry
         case Success(entry) =>
           println(entry.getName)
 

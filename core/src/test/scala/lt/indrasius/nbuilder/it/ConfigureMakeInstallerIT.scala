@@ -61,7 +61,8 @@ class ConfigureMakeInstallerIT extends FlatSpec with MustMatchers with E2E {
     val artifactPath = new File(installDir, "helloworld").getAbsolutePath
     val httpClient = HttpClient()
 
-    testCode(new ConfigureMakeInstaller(artifactUrl, installDir.getAbsolutePath, SandboxProcessFactory, SandboxProcessFactory.makePath), artifactPath) // "loan" the fixture to the test
+    testCode(new ConfigureMakeInstaller(artifactUrl, installDir.getAbsolutePath,
+      SandboxProcessFactory, SandboxProcessFactory.makePath), artifactPath)
   }
 
   "ConfigureMakeBuilder" should "build a simple project successfully" in withSuccessProject { (builder, artifactPath) =>
