@@ -1,4 +1,4 @@
-package lt.indrasius.nbuilder.it
+package lt.indrasius.nbuilder.embedded
 
 import akka.actor.ActorSystem
 

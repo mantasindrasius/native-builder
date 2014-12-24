@@ -1,5 +1,6 @@
 package lt.indrasius.nbuilder.it
 
+import lt.indrasius.nbuilder.embedded.{EmbeddedResourceServer, EmbeddedConfig}
 import lt.indrasius.nbuilder.http.HttpClient
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.MustMatchers

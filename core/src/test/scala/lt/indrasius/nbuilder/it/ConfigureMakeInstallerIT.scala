@@ -5,6 +5,7 @@ import java.nio.file.attribute.PosixFilePermission
 import java.nio.file.{Files, Paths}
 
 import com.twitter.io.TempDirectory
+import lt.indrasius.nbuilder.embedded.{ArtifactStorage, ConfigureMakeProject, E2E}
 import lt.indrasius.nbuilder.http.HttpClient
 import lt.indrasius.nbuilder.{ConfigureMakeInstaller, ProcessFactory}
 import org.scalatest.FlatSpec

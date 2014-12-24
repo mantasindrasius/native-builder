@@ -1,9 +1,8 @@
-package lt.indrasius.nbuilder.it
-
-import spray.http._
+package lt.indrasius.nbuilder.embedded
 
 import spray.http.HttpMethods._
 import spray.http.StatusCodes._
+import spray.http._
 
 /**
  * Created by mantas on 14.12.23.

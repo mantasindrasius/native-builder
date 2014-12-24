@@ -1,18 +1,10 @@
-package lt.indrasius.nbuilder.it
+package lt.indrasius.nbuilder.embedded
 
-import java.io.{InputStream, FileInputStream, File, ByteArrayOutputStream}
-import java.nio.file.attribute.{PosixFilePermissions, PosixFilePermission}
-import java.nio.file.{Paths, Files}
-import java.util.zip.GZIPOutputStream
+import java.io.InputStream
 
-import org.kamranzafar.jtar.{TarHeader, TarEntry, TarOutputStream}
 import spray.http._
 
 import scala.collection.concurrent.TrieMap
-import scala.io.Source
-
-import collection.convert.wrapAsScala.asScalaSet
-import scala.util.Try
 
 /**
  * Created by mantas on 14.12.22.

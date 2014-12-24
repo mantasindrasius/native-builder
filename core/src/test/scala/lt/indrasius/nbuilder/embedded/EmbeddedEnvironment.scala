@@ -1,4 +1,4 @@
-package lt.indrasius.nbuilder.it
+package lt.indrasius.nbuilder.embedded
 
 /**
  * Created by mantas on 14.12.22.

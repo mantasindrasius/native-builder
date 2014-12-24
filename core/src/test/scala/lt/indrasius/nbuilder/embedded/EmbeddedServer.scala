@@ -1,4 +1,4 @@
-package lt.indrasius.nbuilder.it
+package lt.indrasius.nbuilder.embedded
 
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -6,9 +6,9 @@ import akka.actor._
 import akka.io.IO
 import spray.can.Http
 import spray.http._
+
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, promise}
-
 import scala.util.{Success, Try}
 
 /**

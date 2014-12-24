@@ -1,4 +1,4 @@
-package lt.indrasius.nbuilder.it
+package lt.indrasius.nbuilder.embedded
 
 import java.io.ByteArrayOutputStream
 import java.nio.file.attribute.PosixFilePermission

@@ -3,6 +3,7 @@ package lt.indrasius.nbuilder.it
 import java.io.ByteArrayInputStream
 
 import com.twitter.io.TempDirectory
+import lt.indrasius.nbuilder.embedded.TarGzArchiveBuilder
 import lt.indrasius.nbuilder.{ResourceContext, TarGzResourceUnpacker}
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.MustMatchers
