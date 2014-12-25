@@ -1,9 +1,9 @@
 package lt.indrasius.nbuilder.live
 
 import com.twitter.io.TempDirectory
-import lt.indrasius.nbuilder.{RealProcessFactory, ConfigureMakeInstaller}
-import org.scalatest.{Ignore, FlatSpec}
+import lt.indrasius.nbuilder.InstallEnvironment
 import org.scalatest.matchers.MustMatchers
+import org.scalatest.{FlatSpec, Ignore}
 
 /**
  * Created by mantas on 14.12.24.
@@ -11,10 +11,10 @@ import org.scalatest.matchers.MustMatchers
 @Ignore
 class BisonIT extends FlatSpec with MustMatchers {
   "ConfigureMakeInstall" should "install the bison library into the given path" in {
-    val installDir = TempDirectory.create(true)
+    val projectsDir = TempDirectory.create(true).getAbsolutePath
+    val installsDir = TempDirectory.create(true).getAbsolutePath
 
-    new ConfigureMakeInstaller("http://ftp.gnu.org/gnu/bison/bison-2.7.tar.gz", installDir.getAbsolutePath,
-        RealProcessFactory, "make")
-      .build must be a 'success
+    InstallEnvironment(projectsDir, installsDir)
+      .install("http://ftp.gnu.org/gnu/bison/bison-2.7.tar.gz") must be a 'success
   }
 }

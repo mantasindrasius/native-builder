@@ -21,13 +21,14 @@ class TarGzResourceUnpackerIT extends FlatSpec with MustMatchers with MockitoSug
     val tempDir = TempDirectory.create(true)
 
     val tarBytes = TarGzArchiveBuilder()
-      .addFile("test", "hello")
-      .addDir("xyz")
-      .addFile("xyz/hello", "world")
+      .addDir("lib")
+      .addFile("lib/test", "hello")
+      .addFile("lib/hello", "world")
       .build
 
     val in = new ByteArrayInputStream(tarBytes)
 
+    when(context.filename).thenReturn("lib.tar.gz")
     when(context.openRead).thenReturn(Success(in))
 
     testCode(context, tempDir.getAbsolutePath)

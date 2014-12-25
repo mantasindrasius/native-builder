@@ -15,7 +15,7 @@ import scala.util.{Failure, Success, Try}
  * Created by mantas on 14.12.23.
  */
 trait ResourceUnpacker {
-  def unpack(context: ResourceContext, targetDir: String): Try[Unit]
+  def unpack(context: ResourceContext, targetDir: String): Try[String]
 }
 
 class TarGzResourceUnpacker extends ResourceUnpacker {
@@ -31,8 +31,24 @@ class TarGzResourceUnpacker extends ResourceUnpacker {
     01 -> PosixFilePermission.OTHERS_EXECUTE
   )
 
-  def unpack(context: ResourceContext, targetDir: String): Try[Unit] =
-    context.openRead flatMap { unpackTo(_, new File(targetDir)) }
+  def unpack(context: ResourceContext, targetDir: String): Try[String] =
+    for { unpackDir <- determineUnpackDir(context, targetDir)
+          fs <- context.openRead
+          _ <- unpackTo(fs, new File(targetDir))
+          _ <- checkDirExists(unpackDir) }
+      yield unpackDir
+
+  private def determineUnpackDir(context: ResourceContext, targetDir: String): Try[String] =
+    context.filename.split("\\.tar\\.gz").toSeq match {
+      case Seq(basename) => Success(Paths.get(targetDir, basename).toString)
+      case _=> Failure(new IllegalArgumentException("Invalid archive name: " + context.filename))
+    }
+
+  private def checkDirExists(dir: String): Try[Unit] =
+    if (new File(dir).exists())
+      Success()
+    else
+      Failure(new IllegalArgumentException("Archive does not exist: " + dir))
 
   private def unpackTo(in: InputStream, targetDir: File): Try[Unit] = {
     val gzipIn = new GZIPInputStream(in)

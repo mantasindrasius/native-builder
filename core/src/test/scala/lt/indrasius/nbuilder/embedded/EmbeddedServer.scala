@@ -20,15 +20,25 @@ abstract class EmbeddedServer(port: Int) { server =>
   type RequestHandler = HttpRequest => HttpResponse
 
   val host = "localhost"
+  val listener = system.actorOf(Props(Listener), name = "listener")
 
   def start: Try[Unit] = Try {
-    implicit val listener = system.actorOf(Props(Listener), name = "listener")
+    implicit val sender = listener
 
     IO(Http) ! Http.Bind(listener, interface = host, port = port)
+
+    sys.addShutdownHook(() => stop)
 
     Await.result(Listener.started, Duration.Inf)
 
     println(s"Server started on $port")
+  }
+
+  def stop: Try[Unit] = Try {
+    println("Stopping the server")
+    implicit val sender = listener
+
+    listener ! Http.Unbind
   }
 
   def receive: RequestHandler
@@ -50,6 +60,7 @@ abstract class EmbeddedServer(port: Int) { server =>
       case b: Http.Bound =>
         startPromise.complete(Success())
       case b: Http.Unbind => log.info(s"Unbinding")
+      //case b: Http.UnbUnbound => log.info(s"Unbound")
       case c: Http.ConnectionClosed => log.info("Connection closed")
     }
   }

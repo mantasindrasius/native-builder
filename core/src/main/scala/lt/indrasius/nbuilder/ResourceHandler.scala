@@ -12,10 +12,12 @@ trait ResourceHandler {
 }
 
 trait ResourceContext {
+  def filename: String
   def openRead: Try[InputStream]
 }
 
 case class FileResourceContext(file: File) extends ResourceContext {
+  def filename: String = file.getName
   def openRead: Try[InputStream] = Try { new FileInputStream(file) }
 }
 

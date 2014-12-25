@@ -3,6 +3,7 @@ package lt.indrasius.nbuilder
 import java.io.File
 
 import scala.sys.process.Process
+import scala.util.Try
 
 /**
  * Created by mantas on 14.12.24.
