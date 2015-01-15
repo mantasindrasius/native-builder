@@ -36,7 +36,8 @@ trait InstallEnvironmentContext {
   }
 }
 
-class InstallEnvironment(protected val processFactory: ProcessFactory) extends InstallEnvironmentContext {
+trait InstallEnvironment extends InstallEnvironmentContext {
+  protected def processFactory: ProcessFactory
   protected val downloader = new ResourceDownloader(HttpClient(), new FileResourceHandler)
   protected val unpacker = new TarGzResourceUnpacker
 
@@ -44,4 +45,6 @@ class InstallEnvironment(protected val processFactory: ProcessFactory) extends I
     new InstallEnvironment(projectsDir, installsDir)
 }
 
-object InstallEnvironment extends InstallEnvironment(RealProcessFactory)
+object InstallEnvironment extends InstallEnvironment {
+  protected def processFactory: ProcessFactory = RealProcessFactory
+}

@@ -4,7 +4,7 @@ import java.nio.file.attribute.PosixFilePermission
 import java.nio.file.{Files, Paths}
 
 import com.twitter.io.TempDirectory
-import lt.indrasius.nbuilder.{ProcessFactory, RealProcessFactory, InstallEnvironment}
+import lt.indrasius.nbuilder.{InstallEnvironmentContext, ProcessFactory, RealProcessFactory, InstallEnvironment}
 import lt.indrasius.nbuilder.embedded.{ArtifactStorage, ConfigureMakeProject, E2E}
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.MustMatchers
@@ -23,9 +23,10 @@ class InstallEnvironmentIT extends FlatSpec with MustMatchers with E2E {
 
   val artifactUrl = ArtifactStorage.addArtifactFromProject("cool-project", project)
 
-  object SandboxProcessFactory extends ProcessFactory {
+  trait Context extends InstallEnvironment with ProcessFactory {
     val tempPath = TempDirectory.create(true).getAbsolutePath
     val makePath = Paths.get(tempPath, "make")
+    def processFactory = this
 
     {
       val makeBody =
@@ -56,12 +57,22 @@ class InstallEnvironmentIT extends FlatSpec with MustMatchers with E2E {
         cmd
   }
 
-  "InstallEnvironment" should "install and artifact and return path" in {
+  "InstallEnvironment" should "install and artifact and return path" in new Context {
     val givenProjectsDir = TempDirectory.create(true).getAbsolutePath
     val givenInstallsDir = TempDirectory.create(true).getAbsolutePath
 
-    val env = new InstallEnvironment(SandboxProcessFactory)(givenProjectsDir, givenInstallsDir)
+    val env = apply(givenProjectsDir, givenInstallsDir)
 
+    env.install(artifactUrl) must be (Success(givenInstallsDir + "/cool-project"))
+  }
+
+  it should "install the artifact once and return success on the second try" in new Context {
+    val givenProjectsDir = TempDirectory.create(true).getAbsolutePath
+    val givenInstallsDir = TempDirectory.create(true).getAbsolutePath
+
+    val env = apply(givenProjectsDir, givenInstallsDir)
+
+    env.install(artifactUrl) must be (Success(givenInstallsDir + "/cool-project"))
     env.install(artifactUrl) must be (Success(givenInstallsDir + "/cool-project"))
   }
 }
