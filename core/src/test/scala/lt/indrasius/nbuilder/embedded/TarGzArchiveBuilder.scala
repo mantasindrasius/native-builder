@@ -11,15 +11,15 @@ import org.kamranzafar.jtar.{TarEntry, TarHeader, TarOutputStream}
  */
 class TarGzArchiveBuilder {
   private val permissions = Map(
-    PosixFilePermission.OWNER_READ -> 0400,
-    PosixFilePermission.OWNER_WRITE -> 0200,
-    PosixFilePermission.OWNER_EXECUTE -> 0100,
-    PosixFilePermission.GROUP_READ -> 040,
-    PosixFilePermission.GROUP_WRITE -> 020,
-    PosixFilePermission.GROUP_EXECUTE -> 010,
-    PosixFilePermission.OTHERS_READ -> 04,
-    PosixFilePermission.OTHERS_WRITE -> 02,
-    PosixFilePermission.OTHERS_EXECUTE -> 01
+    PosixFilePermission.OWNER_READ -> 256,
+    PosixFilePermission.OWNER_WRITE -> 128,
+    PosixFilePermission.OWNER_EXECUTE -> 64,
+    PosixFilePermission.GROUP_READ -> 32,
+    PosixFilePermission.GROUP_WRITE -> 16,
+    PosixFilePermission.GROUP_EXECUTE -> 8,
+    PosixFilePermission.OTHERS_READ -> 4,
+    PosixFilePermission.OTHERS_WRITE -> 2,
+    PosixFilePermission.OTHERS_EXECUTE -> 1
   )
 
   val bOut = new ByteArrayOutputStream()

@@ -20,15 +20,15 @@ trait ResourceUnpacker {
 
 class TarGzResourceUnpacker extends ResourceUnpacker {
   private val permissions = Map(
-    0400 -> PosixFilePermission.OWNER_READ,
-    0200 -> PosixFilePermission.OWNER_WRITE,
-    0100 -> PosixFilePermission.OWNER_EXECUTE,
-    040 -> PosixFilePermission.GROUP_READ,
-    020 -> PosixFilePermission.GROUP_WRITE,
-    010 -> PosixFilePermission.GROUP_EXECUTE,
-    04 -> PosixFilePermission.OTHERS_READ,
-    02 -> PosixFilePermission.OTHERS_WRITE,
-    01 -> PosixFilePermission.OTHERS_EXECUTE
+    256 -> PosixFilePermission.OWNER_READ,
+    128 -> PosixFilePermission.OWNER_WRITE,
+    64 -> PosixFilePermission.OWNER_EXECUTE,
+    32 -> PosixFilePermission.GROUP_READ,
+    16 -> PosixFilePermission.GROUP_WRITE,
+    8 -> PosixFilePermission.GROUP_EXECUTE,
+    4 -> PosixFilePermission.OTHERS_READ,
+    2 -> PosixFilePermission.OTHERS_WRITE,
+    1 -> PosixFilePermission.OTHERS_EXECUTE
   )
 
   def unpack(context: ResourceContext, targetDir: String): Try[String] =
